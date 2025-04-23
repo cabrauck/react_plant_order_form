@@ -1,6 +1,7 @@
 {
   "name": "React Vite Tailwind Dev",
   "dockerFile": "Dockerfile",
+  "context": "..",
   "appPort": [5173],
   "postCreateCommand": "npm install",
   "customizations": {

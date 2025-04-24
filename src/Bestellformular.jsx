@@ -68,10 +68,10 @@ export default function Bestellformular() {
   }, 0);
 
   const farben = {
-    tomate: "bg-red-50",
-    gurke: "bg-green-50",
-    zucchini: "bg-yellow-50",
-    sonst: "bg-stone-100",
+    tomate: "bg-pink-100",
+    gurke: "bg-green-100",
+    zucchini: "bg-yellow-100",
+    sonst: "bg-blue-100",
   };
 
   const gruppen = [
@@ -83,41 +83,41 @@ export default function Bestellformular() {
 
   if (submitted) {
     return (
-      <div className="max-w-xl mx-auto mt-8 p-4 border rounded">
-        <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'Rock Salt, cursive' }}>Vielen Dank!</h2>
-        <p style={{ fontFamily: 'Open Sans, sans-serif' }}>Deine Bestellung wurde erfolgreich übermittelt.</p>
+      <div className="max-w-xl mx-auto mt-8 p-6 rounded-lg bg-gradient-to-br from-pink-100 via-white to-blue-100 text-center shadow-xl">
+        <h2 className="text-3xl font-bold text-pink-600 mb-2 font-display">🌸 Vielen Dank!</h2>
+        <p className="text-gray-700 font-body">Deine Bestellung wurde erfolgreich übermittelt.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto mt-8 space-y-4 px-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-      <div className="bg-stone-50 shadow rounded-lg p-6 space-y-6 border border-[#00afea]">
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto mt-8 space-y-6 px-4 font-body">
+      <div className="bg-white/70 backdrop-blur-md shadow-2xl rounded-3xl p-8 space-y-8 border border-gray-200">
         <div>
-          <label htmlFor="name" className="block font-medium text-sm text-gray-700">Name *</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-600">Name *</label>
           <input
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-700"
+            className="w-full p-3 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block font-medium text-sm text-gray-700">E-Mail *</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-600">E-Mail *</label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-700"
+            className="w-full p-3 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
           />
         </div>
 
         {gruppen.map(({ key, label }) => (
-          <div key={key} className={`rounded p-2 space-y-1 ${farben[key]}`}>
-            <h4 className="text-gray-700 text-base mb-2" style={{ fontFamily: 'Rock Salt, cursive' }}>{label}</h4>
+          <div key={key} className={`rounded-2xl p-4 space-y-3 ${farben[key]}`}>
+            <h4 className="text-lg font-semibold text-gray-800 tracking-wide font-display">{label}</h4>
             {PREISLISTE.filter(item => item.kategorie === key).map((item) => (
               <div
                 key={item.name}
@@ -127,29 +127,29 @@ export default function Bestellformular() {
                   {item.name} <span className="text-gray-500">({item.preis.toFixed(2)} €)</span>
                 </label>
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => handleDecrement(item.name)} className="w-8 h-8 rounded bg-gray-200 text-lg">-</button>
+                  <button type="button" onClick={() => handleDecrement(item.name)} className="w-8 h-8 rounded-full bg-white border text-lg shadow">-</button>
                   <input
                     type="number"
                     name={item.name}
                     min="0"
                     value={formData[item.name] || ""}
                     onChange={handleChange}
-                    className="w-16 text-center p-2 border rounded bg-white"
+                    className="w-16 text-center p-2 border rounded-xl bg-white shadow"
                   />
-                  <button type="button" onClick={() => handleIncrement(item.name)} className="w-8 h-8 rounded bg-gray-200 text-lg">+</button>
+                  <button type="button" onClick={() => handleIncrement(item.name)} className="w-8 h-8 rounded-full bg-white border text-lg shadow">+</button>
                 </div>
               </div>
             ))}
           </div>
         ))}
 
-        <div className="text-right font-semibold pt-2">
-          Gesamtpreis: {gesamtpreis.toFixed(2)} €
+        <div className="text-right text-lg font-semibold text-gray-800 pt-2">
+          Gesamt: <span className="text-pink-600">{gesamtpreis.toFixed(2)} €</span>
         </div>
 
         <div>
-          <button type="submit" className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 rounded transition">
-            Bestellen
+          <button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-xl transition shadow-md">
+            Jetzt Bestellen ✨
           </button>
         </div>
       </div>

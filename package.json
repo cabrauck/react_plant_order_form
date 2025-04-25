@@ -18,8 +18,10 @@
     "vite": "^4.4.0",
     "wrangler": "^4.13.2"
   }, 
-  "scripts": {
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
   "deploy:worker": "npx wrangler deploy"
-}
-
+  }
 }

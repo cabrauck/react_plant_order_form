@@ -64,5 +64,5 @@ export async function onRequest({ request, env, context }) {
     }
   }
 
-  return new Response('Nur POST oder GET erlaubt', { status: 405 });
+  return new Response('Nur POST oder GET erlaubt', { status: 405 }); 
 }

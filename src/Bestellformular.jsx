@@ -53,12 +53,20 @@ export default function Bestellformular() {
     const payload = {
       name: formData.name,
       email: formData.email,
+      telefon: formData.telefon || '',
       bestellung,
       gesamtbetrag,
       timestamp: new Date().toISOString(),
     };
 
     console.log("Senden an Backend:", payload);
+    await fetch("/bestellen", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
     setSubmitted(true);
   };
 

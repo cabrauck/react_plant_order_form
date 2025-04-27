@@ -18,8 +18,14 @@ export default function Bestellformular() {
   const [formData, setFormData] = useState({ name: "", email: "", telefon: "" });
   const [submitted, setSubmitted] = useState(false);
   const [bestellungDetails, setBestellungDetails] = useState([]);
-  const [gesamtbetrag, setGesamtbetrag] = useState(0);
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+
+  const berechneGesamtbetrag = () => {
+    return PREISLISTE.reduce((sum, item) => {
+      const count = parseInt(formData[item.name] || 0);
+      return sum + (isNaN(count) ? 0 : count * item.preis);
+    }, 0);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,17 +54,12 @@ export default function Bestellformular() {
       preis: item.preis,
     })).filter((b) => b.stueck > 0);
 
-    const gesamtbetrag = bestellung.reduce(
-      (summe, b) => summe + b.stueck * b.preis,
-      0
-    );
-
     const payload = {
       name: formData.name,
       email: formData.email,
       telefon: formData.telefon || '',
       bestellung,
-      gesamtbetrag,
+      gesamtbetrag: berechneGesamtbetrag(),
       timestamp: new Date().toISOString(),
     };
 
@@ -71,7 +72,6 @@ export default function Bestellformular() {
       body: JSON.stringify(payload)
     });
     setBestellungDetails(bestellung);
-    setGesamtbetrag(gesamtbetrag);
     setSubmitted(true);
   };
 
@@ -163,7 +163,7 @@ export default function Bestellformular() {
             ))}
 
             <div className="text-right text-lg font-semibold text-gray-800 pt-2">
-              Gesamt: <span className="text-pink-600">{gesamtbetrag.toFixed(2)} €</span>
+              Gesamt: <span className="text-pink-600">{berechneGesamtbetrag().toFixed(2)} €</span>
             </div>
 
             <div>
@@ -189,7 +189,7 @@ export default function Bestellformular() {
             </ul>
 
             <div className="text-right font-semibold text-gray-900 pt-4">
-              Gesamtbetrag: <span className="text-pink-600">{gesamtbetrag.toFixed(2)} €</span>
+              Gesamtbetrag: <span className="text-pink-600">{berechneGesamtbetrag().toFixed(2)} €</span>
             </div>
           </div>
 

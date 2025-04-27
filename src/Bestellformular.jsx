@@ -125,6 +125,9 @@ export default function Bestellformular() {
 
       {!submitted ? (
         <>
+          <h1 className="text-center text-2xl sm:text-3xl font-bold text-pink-700 font-display mb-4">
+            🌿 Bestellung – Pflanzenmarkt
+          </h1>
           <div className="bg-white/70 backdrop-blur-md shadow-2xl rounded-3xl p-6 sm:p-8 space-y-8 border border-gray-200">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-600">Name *</label>

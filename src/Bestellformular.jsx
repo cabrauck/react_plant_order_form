@@ -199,6 +199,13 @@ export default function Bestellformular() {
             Bitte bring den Betrag in bar mit.<br />
             Tipp: Mach gern einen Screenshot oder Ausdruck dieser Übersicht! 🌿
           </div>
+
+          <button
+            onClick={() => window.print()}
+            className="mt-6 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl shadow-md"
+          >
+            🖨️ Übersicht Drucken
+          </button>
         </div>
       )}
     </form>

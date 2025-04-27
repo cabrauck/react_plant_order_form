@@ -17,6 +17,8 @@ const PREISLISTE = [
 export default function Bestellformular() {
   const [formData, setFormData] = useState({ name: "", email: "", telefon: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [bestellungDetails, setBestellungDetails] = useState([]);
+  const [gesamtbetrag, setGesamtbetrag] = useState(0);
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
 
   const handleChange = (e) => {
@@ -68,13 +70,10 @@ export default function Bestellformular() {
       },
       body: JSON.stringify(payload)
     });
+    setBestellungDetails(bestellung);
+    setGesamtbetrag(gesamtbetrag);
     setSubmitted(true);
   };
-
-  const gesamtpreis = PREISLISTE.reduce((sum, item) => {
-    const count = parseInt(formData[item.name] || 0);
-    return sum + (isNaN(count) ? 0 : count * item.preis);
-  }, 0);
 
   const farben = {
     tomate: "bg-pink-100",
@@ -164,7 +163,7 @@ export default function Bestellformular() {
             ))}
 
             <div className="text-right text-lg font-semibold text-gray-800 pt-2">
-              Gesamt: <span className="text-pink-600">{gesamtpreis.toFixed(2)} €</span>
+              Gesamt: <span className="text-pink-600">{gesamtbetrag.toFixed(2)} €</span>
             </div>
 
             <div>
@@ -175,9 +174,31 @@ export default function Bestellformular() {
           </div>
         </>
       ) : (
-        <div className="p-6 bg-gradient-to-br from-pink-100 via-white to-blue-100 rounded-lg shadow-xl text-center">
+        <div className="p-6 bg-gradient-to-br from-pink-100 via-white to-blue-100 rounded-lg shadow-xl text-center space-y-6">
           <h2 className="text-3xl font-bold text-pink-600 mb-2 font-display">🌸 Vielen Dank!</h2>
           <p className="text-gray-700 font-body">Deine Bestellung wurde erfolgreich übermittelt.</p>
+
+          <div className="text-left space-y-4">
+            <h3 className="text-xl font-bold text-gray-800">📝 Deine Bestellung:</h3>
+            <ul className="space-y-2">
+              {bestellungDetails.map((item) => (
+                <li key={item.artikel} className="text-gray-700">
+                  {item.stueck} × {item.artikel} ({(item.preis * item.stueck).toFixed(2)} €)
+                </li>
+              ))}
+            </ul>
+
+            <div className="text-right font-semibold text-gray-900 pt-4">
+              Gesamtbetrag: <span className="text-pink-600">{gesamtbetrag.toFixed(2)} €</span>
+            </div>
+          </div>
+
+          <div className="mt-6 text-sm text-gray-600">
+            Wir sehen uns zur Abholung am <strong>03.05.</strong> beim Pflanzenmarkt,<br />
+            <strong>Hauptstraße 6</strong>.<br />
+            Bitte bring den Betrag in bar mit.<br />
+            Tipp: Mach gern einen Screenshot oder Ausdruck dieser Übersicht! 🌿
+          </div>
         </div>
       )}
     </form>

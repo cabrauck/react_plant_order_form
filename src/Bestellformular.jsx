@@ -1,4 +1,4 @@
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 
 const PREISLISTE = [
   { name: "Tomaten Normal", preis: 1.5, kategorie: "tomate" },
@@ -60,18 +60,12 @@ export default function Bestellformular() {
     };
 
     console.log("Senden an Backend:", payload);
-    await fetch("https://ogv-bestellformular.pages.dev/bestellen", {
+    await fetch("/api/bestellen", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
-    }).then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-    }).catch(error => {
-      console.error("Fehler beim Senden der Bestellung:", error);
     });
     setSubmitted(true);
   };

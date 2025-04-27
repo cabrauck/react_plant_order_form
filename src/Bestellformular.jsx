@@ -21,7 +21,10 @@ export default function Bestellformular() {
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
 
   const berechneGesamtbetrag = () => {
-    return bestellungDetails.reduce((sum, item) => sum + item.stueck * item.preis, 0);
+    return PREISLISTE.reduce((sum, item) => {
+      const count = parseInt(formData[item.name] || 0);
+      return sum + (isNaN(count) ? 0 : count * item.preis);
+    }, 0);
   };
 
   const handleChange = (e) => {
@@ -56,7 +59,7 @@ export default function Bestellformular() {
       email: formData.email,
       telefon: formData.telefon || '',
       bestellung,
-      gesamtbetrag: bestellung.reduce((sum, b) => sum + b.stueck * b.preis, 0),
+      gesamtbetrag: berechneGesamtbetrag(),
       timestamp: new Date().toISOString(),
     };
 

@@ -18,6 +18,7 @@ export default function Bestellformular() {
   const [formData, setFormData] = useState({ name: "", email: "", telefon: "" });
   const [submitted, setSubmitted] = useState(false);
   const [bestellungDetails, setBestellungDetails] = useState([]);
+  const [sending, setSending] = useState(false);
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
 
   const berechneGesamtbetrag = () => {
@@ -48,6 +49,7 @@ export default function Bestellformular() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSending(true);
     const bestellung = PREISLISTE.map((item) => ({
       artikel: item.name,
       stueck: parseInt(formData[item.name] || 0),
@@ -73,6 +75,7 @@ export default function Bestellformular() {
     });
     setBestellungDetails(bestellung);
     setSubmitted(true);
+    setSending(false);
   };
 
   const farben = {
@@ -126,7 +129,7 @@ export default function Bestellformular() {
       {!submitted ? (
         <>
           <h1 className="text-center text-2xl sm:text-3xl font-bold text-pink-700 font-display mb-4">
-            🌿 Bestellung – Pflanzenmarkt
+            🌿 Bestellung – Pflanzenmarkt 🌿
           </h1>
           <div className="bg-white/70 backdrop-blur-md shadow-2xl rounded-3xl p-6 sm:p-8 space-y-8 border border-gray-200">
             <div>
@@ -194,8 +197,12 @@ export default function Bestellformular() {
             </div>
 
             <div>
-              <button type="submit" className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition shadow-md">
-                Jetzt Bestellen ✨
+              <button
+                type="submit"
+                className={`w-full ${sending ? 'bg-gray-400' : 'bg-pink-500 hover:bg-pink-600'} text-white font-semibold py-4 px-6 rounded-xl transition shadow-md`}
+                disabled={sending}
+              >
+                {sending ? 'Bestellung wird gesendet...' : 'Jetzt Bestellen ✨'}
               </button>
             </div>
           </div>

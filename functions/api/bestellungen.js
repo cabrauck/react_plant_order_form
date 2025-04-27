@@ -4,18 +4,9 @@
 export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
-    console.log("POST-Daten empfangen:", data);
-
-    // Validierung (minimal)
-    if (!data?.name || !data?.email || !Array.isArray(data?.bestellung)) {
-      console.warn("Ungültige Datenstruktur:", data);
-      return new Response('Bad Request', { status: 400 });
-    }
-
     const id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
-    // CSV-kompatibles Format als String vorbereiten
     const csvLine = [
       id,
       timestamp,
@@ -26,15 +17,10 @@ export async function onRequestPost({ request, env }) {
       data.gesamtbetrag
     ].join(';');
 
-    console.log("Speichern in KV:", `bestellung:${id}`);
-
-    // In KV speichern
     await env.BESTELLUNGEN_KV.put(`bestellung:${id}`, csvLine);
 
-    console.log("Speichern erfolgreich");
     return new Response('Gespeichert', { status: 200 });
   } catch (err) {
-    console.error("Fehler beim POST:", err);
     return new Response('Server Error', { status: 500 });
   }
 }
@@ -56,7 +42,6 @@ export async function onRequestGet({ env }) {
       }
     });
   } catch (err) {
-    console.error("Fehler beim GET:", err);
     return new Response('Fehler beim Abruf', { status: 500 });
   }
 }

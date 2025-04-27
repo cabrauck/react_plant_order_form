@@ -1,5 +1,5 @@
 // Cloudflare Pages Function zum Empfangen von Bestellungen via POST und Speichern in KV
-// + CSV-Kompatibilität für späteren Excel-Export
+// + CSV-Kompatibilität für späteren Excel-Expor
 
 export async function onRequestPost({ request, env }) {
   try {
@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env }) {
   }
 }
 
-export async function onRequestGet({  request, env, context  }) {
+export async function onRequestGet({ env }) {
   try {
     const { keys } = await env.BESTELLUNGEN_KV.list({ prefix: 'bestellung:' });
     const daten = await Promise.all(
@@ -60,4 +60,3 @@ export async function onRequestGet({  request, env, context  }) {
     return new Response('Fehler beim Abruf', { status: 500 });
   }
 }
-      alert("Fehler beim Senden der Bestellung. Bitte versuchen Sie es später erneut.");

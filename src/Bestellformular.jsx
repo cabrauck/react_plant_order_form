@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const PREISLISTE = [
   { name: "Tomaten Normal", preis: 1.5, kategorie: "tomate" },
@@ -21,10 +21,7 @@ export default function Bestellformular() {
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
 
   const berechneGesamtbetrag = () => {
-    return PREISLISTE.reduce((sum, item) => {
-      const count = parseInt(formData[item.name] || 0);
-      return sum + (isNaN(count) ? 0 : count * item.preis);
-    }, 0);
+    return bestellungDetails.reduce((sum, item) => sum + item.stueck * item.preis, 0);
   };
 
   const handleChange = (e) => {
@@ -59,7 +56,7 @@ export default function Bestellformular() {
       email: formData.email,
       telefon: formData.telefon || '',
       bestellung,
-      gesamtbetrag: berechneGesamtbetrag(),
+      gesamtbetrag: bestellung.reduce((sum, b) => sum + b.stueck * b.preis, 0),
       timestamp: new Date().toISOString(),
     };
 
@@ -88,6 +85,30 @@ export default function Bestellformular() {
     { key: "zucchini", label: "🟡 Zucchini" },
     { key: "sonst", label: "🌶️ Sonstiges" }
   ];
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #druckbereich, #druckbereich * {
+          visibility: visible;
+        }
+        #druckbereich {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto mt-8 space-y-6 px-4 font-body">
@@ -174,8 +195,8 @@ export default function Bestellformular() {
           </div>
         </>
       ) : (
-        <div className="p-6 bg-gradient-to-br from-pink-100 via-white to-blue-100 rounded-lg shadow-xl text-center space-y-6">
-          <h2 className="text-3xl font-bold text-pink-600 mb-2 font-display">🌸 Vielen Dank!</h2>
+        <div id="druckbereich" className="p-6 bg-gradient-to-br from-pink-100 via-white to-blue-100 rounded-lg shadow-xl text-center space-y-6">
+          <h2 className="text-3xl font-bold text-pink-600 mb-2 font-display">🌸 Vielen Dank, {formData.name}!</h2>
           <p className="text-gray-700 font-body">Deine Bestellung wurde erfolgreich übermittelt.</p>
 
           <div className="text-left space-y-4">

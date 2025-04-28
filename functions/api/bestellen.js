@@ -1,47 +1,61 @@
-// Cloudflare Pages Function zum Empfangen von Bestellungen via POST und Speichern in KV
-// + CSV-Kompatibilität für späteren Excel-Expor
-
 export async function onRequestPost({ request, env }) {
+  const { TENANT_ID, CLIENT_ID, CLIENT_SECRET, SHAREPOINT_SITE, LIST_NAME } = env;
+
   try {
     const data = await request.json();
-    const id = crypto.randomUUID();
-    const timestamp = new Date().toISOString();
 
-    const csvLine = [
-      id,
-      timestamp,
-      JSON.stringify(data.name),
-      JSON.stringify(data.email),
-      JSON.stringify(data.telefon || ''),
-      JSON.stringify(data.bestellung),
-      data.gesamtbetrag
-    ].join(';');
+    if (!data?.name || !data?.email || !Array.isArray(data?.bestellung)) {
+      return new Response('Bad Request', { status: 400 });
+    }
 
-    await env.BESTELLUNGEN_KV.put(`bestellung:${id}`, csvLine);
-
-    return new Response('Gespeichert', { status: 200 });
-  } catch (err) {
-    return new Response('Server Error', { status: 500 });
-  }
-}
-
-export async function onRequestGet({ env }) {
-  try {
-    const { keys } = await env.BESTELLUNGEN_KV.list({ prefix: 'bestellung:' });
-    const daten = await Promise.all(
-      keys.map(async (k) => await env.BESTELLUNGEN_KV.get(k.name))
-    );
-
-    const header = 'ID;Timestamp;Name;E-Mail;Telefon;Bestellung;Gesamtbetrag';
-    const body = [header, ...daten].join('\n');
-
-    return new Response(body, {
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': 'attachment; filename="bestellungen.csv"'
-      }
+    const tokenResponse = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        scope: 'https://graph.microsoft.com/.default',
+      })
     });
+
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    const payload = {
+      fields: {
+        Title: data.name,
+        Email: data.email,
+        Telefon: data.telefon || '',
+        Bestellung: JSON.stringify(data.bestellung),
+        Gesamtbetrag: data.gesamtbetrag,
+        Status: "pending",  // Wichtig für späteres Double-Opt-In
+        Timestamp: new Date().toISOString()
+      }
+    };
+
+    const listApiUrl = `${SHAREPOINT_SITE}/_api/web/lists/GetByTitle('${LIST_NAME}')/items`;
+
+    const response = await fetch(listApiUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json;odata=verbose',
+        'Content-Type': 'application/json;odata=verbose',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Fehler beim Schreiben in Lists:', error);
+      return new Response('Fehler bei Lists', { status: 500 });
+    }
+
+    return new Response('Bestellung gespeichert!', { status: 200 });
+
   } catch (err) {
-    return new Response('Fehler beim Abruf', { status: 500 });
+    console.error('Fehler im Worker:', err);
+    return new Response('Server Error', { status: 500 });
   }
 }

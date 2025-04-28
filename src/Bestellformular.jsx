@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 
 const PREISLISTE = [
   { name: "Tomaten Normal", preis: 1.5, kategorie: "tomate" },

@@ -1,61 +1,85 @@
-export async function onRequestPost({ request, env }) {
-  const { TENANT_ID, CLIENT_ID, CLIENT_SECRET, SHAREPOINT_SITE, LIST_NAME } = env;
+export async function onRequestPost(context) {
+  const { request, env } = context;
 
   try {
-    const data = await request.json();
+    const payload = await request.json();
 
-    if (!data?.name || !data?.email || !Array.isArray(data?.bestellung)) {
-      return new Response('Bad Request', { status: 400 });
+    if (!payload || !payload.name || !payload.email || !Array.isArray(payload.bestellung)) {
+      console.warn("Ungültige Bestelldaten erhalten:", JSON.stringify(payload));
+      return new Response("Ungültige Bestellung", { status: 400 });
     }
 
-    const tokenResponse = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        scope: 'https://graph.microsoft.com/.default',
-      })
-    });
+    const { name, email, telefon = '', bestellung, gesamtbetrag } = payload;
 
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
+    const accessToken = await getAccessToken(env);
+    if (!accessToken) {
+      console.error("Kein AccessToken verfügbar.");
+      return new Response("Serverfehler: AccessToken fehlt", { status: 500 });
+    }
 
-    const payload = {
+    const graphEndpoint = `https://graph.microsoft.com/v1.0/sites/${env.M365_SITE_ID}/lists/${env.M365_LIST_ID}/items`;
+
+    const graphBody = {
       fields: {
-        Title: data.name,
-        Email: data.email,
-        Telefon: data.telefon || '',
-        Bestellung: JSON.stringify(data.bestellung),
-        Gesamtbetrag: data.gesamtbetrag,
-        Status: "pending",  // Wichtig für späteres Double-Opt-In
-        Timestamp: new Date().toISOString()
+        Title: name,
+        Email: email,
+        Telefon: telefon,
+        Bestellung: JSON.stringify(bestellung),
+        Gesamtbetrag: gesamtbetrag,
+        Status: "pending"
       }
     };
 
-    const listApiUrl = `${SHAREPOINT_SITE}/_api/web/lists/GetByTitle('${LIST_NAME}')/items`;
-
-    const response = await fetch(listApiUrl, {
+    const res = await fetch(graphEndpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/json;odata=verbose',
-        'Content-Type': 'application/json;odata=verbose',
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(graphBody)
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Fehler beim Schreiben in Lists:', error);
-      return new Response('Fehler bei Lists', { status: 500 });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`Fehler beim Schreiben in Microsoft Lists: ${res.status} - ${errorText}`);
+      return new Response("Serverfehler bei Speicherung", { status: 500 });
     }
 
-    return new Response('Bestellung gespeichert!', { status: 200 });
+    console.log("Bestellung erfolgreich gespeichert.");
+    return new Response("Bestellung erfolgreich", { status: 200 });
 
   } catch (err) {
-    console.error('Fehler im Worker:', err);
-    return new Response('Server Error', { status: 500 });
+    console.error("Unerwarteter Fehler:", err);
+    return new Response("Interner Serverfehler", { status: 500 });
+  }
+}
+
+async function getAccessToken(env) {
+  try {
+    const tokenUrl = `https://login.microsoftonline.com/${env.M365_TENANT_ID}/oauth2/v2.0/token`;
+    const body = new URLSearchParams();
+    body.append('client_id', env.M365_CLIENT_ID);
+    body.append('client_secret', env.M365_CLIENT_SECRET);
+    body.append('grant_type', 'client_credentials');
+    body.append('scope', 'https://graph.microsoft.com/.default');
+
+    const res = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`Fehler beim AccessToken holen: ${res.status} - ${errorText}`);
+      return null;
+    }
+
+    const { access_token } = await res.json();
+    return access_token;
+
+  } catch (err) {
+    console.error("Fehler in getAccessToken():", err);
+    return null;
   }
 }

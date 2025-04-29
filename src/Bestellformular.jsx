@@ -128,7 +128,7 @@ export default function Bestellformular() {
     window.turnstileLoaded = () => {
       if (window.turnstile) {
         window.turnstile.render(turnstileRef.current, {
-          sitekey: "DEIN_SITE_KEY",
+          sitekey: "0x4AAAAAABWeQ9UtBL_I2RFBvBk2pkp9kKQ",
           callback: (token) => setCfTurnstileResponse(token)
         });
       }

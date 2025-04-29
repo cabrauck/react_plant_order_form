@@ -7,15 +7,34 @@ export async function onRequest(context) {
 
   if (request.method === 'POST') {
     try {
-      const payload = await request.json();
-      console.log("Empfangenes Payload:", JSON.stringify(payload));
+      const formData = await request.json();
+      console.log("Empfangenes Payload:", JSON.stringify(formData));
 
-      if (!payload || !payload.name || !payload.email || !Array.isArray(payload.bestellung)) {
-        console.warn("Ungültige Bestelldaten erhalten:", JSON.stringify(payload));
+      if (!formData || !formData.name || !formData.email || !Array.isArray(formData.bestellung) || !formData.cfTurnstileResponse) {
+        console.warn("Ungültige Bestelldaten erhalten:", JSON.stringify(formData));
         return new Response("Ungültige Bestellung", { status: 400 });
       }
 
-      const { name, email, telefon = '', bestellung, gesamtbetrag } = payload;
+      const token = formData.cfTurnstileResponse;
+      const ip = request.headers.get("CF-Connecting-IP");
+
+      const turnstileRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          secret: env.TURNSTILE_SECRET,
+          response: token,
+          remoteip: ip
+        })
+      });
+
+      const turnstileData = await turnstileRes.json();
+      if (!turnstileData.success) {
+        console.error("Turnstile-Validierung fehlgeschlagen:", turnstileData);
+        return new Response("Turnstile-Verifizierung fehlgeschlagen", { status: 400 });
+      }
+
+      const { name, email, telefon = '', bestellung, gesamtbetrag } = formData;
 
       console.log("Hole AccessToken...");
       const accessToken = await getAccessToken(env);
@@ -96,4 +115,3 @@ async function getAccessToken(env) {
     return null;
   }
 }
-  

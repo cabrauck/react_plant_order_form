@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const PREISLISTE = [
   { name: "Tomaten Normal", preis: 1.5, kategorie: "tomate" },
@@ -20,6 +20,8 @@ export default function Bestellformular() {
   const [bestellungDetails, setBestellungDetails] = useState([]);
   const [sending, setSending] = useState(false);
   const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+  const [cfTurnstileResponse, setCfTurnstileResponse] = useState("");
+  const turnstileRef = useRef(null);
 
   const berechneGesamtbetrag = () => {
     return PREISLISTE.reduce((sum, item) => {
@@ -50,6 +52,13 @@ export default function Bestellformular() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
+
+    if (!cfTurnstileResponse) {
+      alert("Bitte bestätige, dass du kein Roboter bist.");
+      setSending(false);
+      return;
+    }
+
     const bestellung = PREISLISTE.map((item) => ({
       artikel: item.name,
       stueck: parseInt(formData[item.name] || 0),
@@ -62,15 +71,14 @@ export default function Bestellformular() {
       telefon: formData.telefon || '',
       bestellung,
       gesamtbetrag: berechneGesamtbetrag(),
+      cfTurnstileResponse,
       timestamp: new Date().toISOString(),
     };
 
     console.log("Senden an Backend:", payload);
     await fetch("/api/bestellen", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
     setBestellungDetails(bestellung);
@@ -111,8 +119,24 @@ export default function Bestellformular() {
       }
     `;
     document.head.appendChild(style);
+
+    const script = document.createElement('script');
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileLoaded";
+    script.async = true;
+    document.body.appendChild(script);
+
+    window.turnstileLoaded = () => {
+      if (window.turnstile) {
+        window.turnstile.render(turnstileRef.current, {
+          sitekey: "DEIN_SITE_KEY",
+          callback: (token) => setCfTurnstileResponse(token)
+        });
+      }
+    };
+
     return () => {
       document.head.removeChild(style);
+      document.body.removeChild(script);
     };
   }, []);
 
@@ -194,6 +218,10 @@ export default function Bestellformular() {
 
             <div className="text-right text-lg font-semibold text-gray-800 pt-2">
               Gesamt: <span className="text-pink-600">{berechneGesamtbetrag().toFixed(2)} €</span>
+            </div>
+
+            <div className="flex justify-center my-4">
+              <div ref={turnstileRef} className="cf-turnstile" data-sitekey="DEIN_SITE_KEY" data-theme="light"></div>
             </div>
 
             <div>

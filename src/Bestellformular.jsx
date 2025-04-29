@@ -131,7 +131,9 @@ export default function Bestellformular() {
       if (window.turnstile) {
         window.turnstile.render(turnstileRef.current, {
           sitekey: SITE_KEY,
-          callback: (token) => setCfTurnstileResponse(token)
+          callback: (token) => setCfTurnstileResponse(token),
+          theme: "light",
+          size: "normal"
         });
       }
     };
@@ -221,12 +223,11 @@ export default function Bestellformular() {
             <div className="text-right text-lg font-semibold text-gray-800 pt-2">
               Gesamt: <span className="text-pink-600">{berechneGesamtbetrag().toFixed(2)} €</span>
             </div>
-
             <div className="flex justify-center my-4">
-              <div ref={turnstileRef} className="cf-turnstile" data-sitekey="0x4AAAAAABWeQz7LaTuMCIy1" data-theme="light"></div>
-            </div>
-
-            <div>
+        <div className="rounded-xl bg-white border shadow-md p-4 flex justify-center" style={{ width: '100%', maxWidth: '300px' }}>
+          <div ref={turnstileRef} className="cf-turnstile" data-sitekey="0x4AAAAAABWeQz7LaTuMCIy1" data-theme="light"></div>
+        </div>
+      </div>
               <button
                 type="submit"
                 className={`w-full ${sending ? 'bg-gray-400' : 'bg-pink-500 hover:bg-pink-600'} text-white font-semibold py-4 px-6 rounded-xl transition shadow-md`}
@@ -235,7 +236,7 @@ export default function Bestellformular() {
                 {sending ? 'Bestellung wird gesendet...' : 'Jetzt Bestellen ✨'}
               </button>
             </div>
-          </div>
+          
         </>
       ) : (
         <div id="druckbereich" className="p-6 bg-gradient-to-br from-pink-100 via-white to-blue-100 rounded-lg shadow-xl text-center space-y-6">

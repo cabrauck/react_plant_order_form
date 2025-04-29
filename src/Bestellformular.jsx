@@ -23,6 +23,8 @@ export default function Bestellformular() {
   const [cfTurnstileResponse, setCfTurnstileResponse] = useState("");
   const turnstileRef = useRef(null);
 
+  const SITE_KEY = "0x4AAAAAABWeQz7LaTuMCIy1";
+
   const berechneGesamtbetrag = () => {
     return PREISLISTE.reduce((sum, item) => {
       const count = parseInt(formData[item.name] || 0);
@@ -128,7 +130,7 @@ export default function Bestellformular() {
     window.turnstileLoaded = () => {
       if (window.turnstile) {
         window.turnstile.render(turnstileRef.current, {
-          sitekey: "0x4AAAAAABWeQ9UtBL_I2RFBvBk2pkp9kKQ",
+          sitekey: SITE_KEY,
           callback: (token) => setCfTurnstileResponse(token)
         });
       }

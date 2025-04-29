@@ -224,10 +224,11 @@ export default function Bestellformular() {
               Gesamt: <span className="text-pink-600">{berechneGesamtbetrag().toFixed(2)} €</span>
             </div>
             <div className="flex justify-center my-4">
-        <div className="rounded-xl bg-white border shadow-md p-4 flex justify-center" style={{ width: '100%', maxWidth: '300px' }}>
-          <div ref={turnstileRef} className="cf-turnstile" data-sitekey="0x4AAAAAABWeQz7LaTuMCIy1" data-theme="light"></div>
-        </div>
-      </div>
+              <div ref={turnstileRef} className="cf-turnstile" data-sitekey="0x4AAAAAABWeQz7LaTuMCIy1" data-theme="light"></div>
+            </div>
+            </div>
+
+            <div>
               <button
                 type="submit"
                 className={`w-full ${sending ? 'bg-gray-400' : 'bg-pink-500 hover:bg-pink-600'} text-white font-semibold py-4 px-6 rounded-xl transition shadow-md`}

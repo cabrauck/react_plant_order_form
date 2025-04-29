@@ -221,7 +221,7 @@ export default function Bestellformular() {
             </div>
 
             <div className="flex justify-center my-4">
-              <div ref={turnstileRef} className="cf-turnstile" data-sitekey="DEIN_SITE_KEY" data-theme="light"></div>
+              <div ref={turnstileRef} className="cf-turnstile" data-sitekey="0x4AAAAAABWeQz7LaTuMCIy1" data-theme="light"></div>
             </div>
 
             <div>

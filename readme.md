@@ -1,6 +1,6 @@
 # Order Form
 
-This is a web-based order form for the local gardening club (Obst- und Gartenbauverein), built with [SvelteKit](https://kit.svelte.dev), Tailwind CSS, and TypeScript. It enables members to easily submit their orders online.
+This is a web-based order form for the local gardening club (Obst- und Gartenbauverein), built with React. It enables members to easily submit their orders online.
 
 ## Features
 

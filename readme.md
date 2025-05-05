@@ -9,6 +9,7 @@ This is a web-based order form for the local gardening club (Obst- und Gartenbau
 * ✉️ Order submission via email
 * 📄 Excel export (planned)
 * 🚪 Admin login for customizing the form (planned)
+* 🛡️ Cloudflare Turnstile integration for spam protection (integrated in form.svelte using the Turnstile widget and token validation via the server endpoint)
 
 ## Project Structure
 
@@ -43,7 +44,7 @@ The app will be available at `http://localhost:5173`.
 
 ## Deployment
 
-The project is optimized for deployment on [Cloudflare Pages](https://pages.cloudflare.com/). The target domain is `idsec.cc`.
+The project is optimized for deployment on [Cloudflare Pages](https://pages.cloudflare.com/).
 
 ### Build Command for Pages
 
@@ -58,7 +59,3 @@ Pull requests are welcome. Please ensure clean code and use `prettier` for forma
 ```bash
 npm run format
 ```
-
-## License
-
-MIT License. Copyright (c) 2025.

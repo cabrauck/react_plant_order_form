@@ -5,17 +5,11 @@ This is a web-based order form for the local gardening club (Obst- und Gartenbau
 ## Features
 
 * ✨ Modern, responsive design
-* 📢 Form validation using Zod and Superforms
-* ✉️ Order submission via email
+* 📢 Form validation
+* ✉️ Order submission to Cloudflare K1
 * 📄 Excel export (planned)
-* 🚪 Admin login for customizing the form (planned)
-* 🛡️ Cloudflare Turnstile integration for spam protection (integrated in form.svelte using the Turnstile widget and token validation via the server endpoint)
-
-## Project Structure
-
-* `src/routes` – SvelteKit routes including the order form pages
-* `src/lib` – Reusable components and helper functions
-* `static/` – Static assets (e.g. club logo)
+* 🚪 Admin link for downloading csv from K1
+* 🛡️ Cloudflare Turnstile integration for spam protection (using the Turnstile widget and token validation via the server endpoint)
 
 ## Development
 

@@ -21,8 +21,8 @@ This is a web-based order form for the local gardening club (Obst- und Gartenbau
 ### Getting Started
 
 ```bash
-git clone https://github.com/cabrauck/ogv-bestellformular.git
-cd ogv-bestellformular
+git clone https://github.com/cabrauck/react_plant_order_form.git
+cd react_plant_order_form
 code .
 ```
 
